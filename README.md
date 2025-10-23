@@ -57,9 +57,9 @@ Audio content moderation is crucial for platforms dealing with user-generated au
 The dataset consists of 100 audio clips (WAV/MP3) categorized into harmful (e.g., harassment, bullying) and safe (neutral) content.
 
 ### Source and Preparation
-- **Download**: Run `python download_from_drive.py` to fetch `harmful.zip` and `safe.zip` from Google Drive.
+- **Download**: Run `python src/download_from_drive.py` to fetch `harmful.zip` and `safe.zip` from Google Drive.
 - **Unzip**: Extract to `data/harmful/` and `data/safe/`.
-- **Labels**: `python prep_dataset.py` generates `data/labels.csv` with columns: `path` (e.g., "harmful/file.mp3"), `label` (0=safe, 1=harmful).
+- **Labels**: `python src/prep_dataset.py` generates `data/labels.csv` with columns: `path` (e.g., "harmful/file.mp3"), `label` (0=safe, 1=harmful).
 
 ### Statistics
 - Total samples: 100 (60 harmful, 40 safe).
@@ -148,13 +148,13 @@ Training is handled by `train.py`, supporting both architectures with flexible h
 ### Examples
 ```bash
 # Train CNN v1 with default settings
-python train.py --width_mult 1.0 --dropout 0.2 --lr 5e-4 --batch_size 4 --epochs 50 --ckpt lite_cnn_v1.pt
+python src/train.py --width_mult 1.0 --dropout 0.2 --lr 5e-4 --batch_size 4 --epochs 50 --ckpt lite_cnn_v1.pt
 
 # Train Wav2Vec2 v2 with unfreezing
-python train.py --use_wav2vec2 --lr 5e-4 --epochs 20 --batch_size 2 --num_unfrozen_layers 2 --ckpt wav2vec2_v2.pt
+python src/train.py --use_wav2vec2 --lr 5e-4 --epochs 20 --batch_size 2 --num_unfrozen_layers 2 --ckpt wav2vec2_v2.pt
 
 # With sampler and autocast
-python train.py --use_wav2vec2 --lr 3e-4 --use_sampler --use_autocast --ckpt wav2vec2_custom.pt
+python src/train.py --use_wav2vec2 --lr 3e-4 --use_sampler --use_autocast --ckpt wav2vec2_custom.pt
 ```
 
 ### Monitoring
@@ -211,23 +211,23 @@ print(f"Prediction: {pred}, Confidence: {prob:.3f}")
 ### ONNX Inference
 1. **Export**:
    ```bash
-   python export_onnx.py --ckpt lite_cnn_v1.pt --onnx lite_cnn_v1_fixed.onnx --width_mult 1.0 --dropout 0.2
+   python src/export_onnx.py --ckpt lite_cnn_v1.pt --onnx lite_cnn_v1_fixed.onnx --width_mult 1.0 --dropout 0.2
    # For Wav2Vec2: add --use_wav2vec2
    ```
 
 2. **Quantize** (CNN only):
    ```bash
-   python quantize_onnx.py --onnx_in lite_cnn_v1_fixed.onnx --onnx_out lite_cnn_v1_int8.onnx
+   python src/quantize_onnx.py --onnx_in lite_cnn_v1_fixed.onnx --onnx_out lite_cnn_v1_int8.onnx
    ```
 
 3. **Batch Inference**:
    ```bash
-   python infer_dataset.py --onnx lite_cnn_v1_fixed.onnx --output_csv data/lite_cnn_v1_predictions.csv
+   python src/infer_long.py --onnx lite_cnn_v1_fixed.onnx --output_csv data/lite_cnn_v1_predictions.csv
    ```
 
 4. **Single File**:
    ```bash
-   python infer.py --audio_path path/to/audio.wav --onnx lite_cnn_v1_fixed.onnx
+   python src/infer.py --audio_path path/to/audio.wav --onnx lite_cnn_v1_fixed.onnx
    ```
 
 ### Performance Notes
@@ -238,22 +238,22 @@ print(f"Prediction: {pred}, Confidence: {prob:.3f}")
 ## File Structure
 Detailed breakdown of all files:
 
-- **`config.py`**: Defines `CFG` dataclass with hyperparameters (e.g., sample_rate=16000, batch_size=8). Includes `seed_all()` for reproducibility and `get_device()` for MPS/CUDA/CPU detection.
-- **`dataset.py`**: `HelmitAudioDS` class loads audio, applies preprocessing/augmentation. Supports mel-spec or raw audio based on `return_raw_audio`.
-- **`model.py`**: Defines `LiteAudioCNN` and `Wav2Vec2Classifier`. Includes forward passes and optional feature extraction.
-- **`train.py`**: Main training script. Handles data loading, optimization, logging, and checkpointing.
-- **`export_onnx.py`**: Exports PyTorch models to ONNX with dynamic shapes. Requires model-specific flags.
-- **`quantize_onnx.py`**: Applies INT8 quantization using ONNX Runtime. Cleans model graph to avoid shape issues.
-- **`infer.py`**: Single-file inference with ONNX. Loads audio, preprocesses, predicts, and prints result.
-- **`infer_dataset.py`**: Batch inference on full dataset. Saves predictions to CSV for evaluation.
-- **`compute_metrics.py`**: Computes and saves metrics (accuracy, F1, etc.) from prediction CSVs.
-- **`utils_audio.py`**: Helper functions: `load_audio()`, `to_logmel()`, `crop_or_pad()`, `add_noise()`.
-- **`prep_dataset.py`**: Scans `data/` folders and generates `labels.csv`.
-- **`download_from_drive.py`**: Downloads dataset zips from Google Drive links.
+- **`src/config.py`**: Defines `CFG` dataclass with hyperparameters (e.g., sample_rate=16000, batch_size=8). Includes `seed_all()` for reproducibility and `get_device()` for MPS/CUDA/CPU detection.
+- **`src/dataset.py`**: `HelmitAudioDS` class loads audio, applies preprocessing/augmentation. Supports mel-spec or raw audio based on `return_raw_audio`.
+- **`src/model.py`**: Defines `LiteAudioCNN` and `Wav2Vec2Classifier`. Includes forward passes and optional feature extraction.
+- **`src/train.py`**: Main training script. Handles data loading, optimization, logging, and checkpointing.
+- **`src/export_onnx.py`**: Exports PyTorch models to ONNX with dynamic shapes. Requires model-specific flags.
+- **`src/quantize_onnx.py`**: Applies INT8 quantization using ONNX Runtime. Cleans model graph to avoid shape issues.
+- **`src/infer.py`**: Single-file inference with ONNX. Loads audio, preprocesses, predicts, and prints result.
+- **`src/infer_long.py`**: Batch inference on full dataset. Saves predictions to CSV for evaluation.
+- **`src/compute_metrics.py`**: Computes and saves metrics (accuracy, F1, etc.) from prediction CSVs.
+- **`src/utils_audio.py`**: Helper functions: `load_audio()`, `to_logmel()`, `crop_or_pad()`, `add_noise()`.
+- **`src/prep_dataset.py`**: Scans `data/` folders and generates `labels.csv`.
+- **`src/download_from_drive.py`**: Downloads dataset zips from Google Drive links.
 - **`requirements.txt`**: List of Python packages with versions.
 - **`model_configs.txt`**: Summary of training configs for each model.
 - **`model_metrics.txt`**: Performance metrics for all models.
-- **`insights.md`**: Analysis of model bias and improvement suggestions.
+- **`docs/insights.md`**: Analysis of model bias and improvement suggestions.
 - **`data/`**: 
   - `labels.csv`: Ground truth labels.
   - `*_predictions.csv`: Inference results (path, label, pred, prob).
