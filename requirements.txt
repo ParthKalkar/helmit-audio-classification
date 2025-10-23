@@ -1,0 +1,23 @@
+## requirements-macos.txt
+
+# Core
+numpy>=1.26.4
+scipy>=1.13.1
+pandas>=2.2.2
+
+# Audio / DSP
+librosa>=0.10.1
+soundfile>=0.12.1
+
+# Torch (CPU is fine for M2)
+torch>=2.3.1
+torchaudio>=2.3.1
+
+# ONNX
+onnx>=1.16.0
+onnxruntime>=1.17.0
+
+# Training / Metrics / Utils
+scikit-learn>=1.4.2
+psutil>=5.9.8
+matplotlib>=3.8.4

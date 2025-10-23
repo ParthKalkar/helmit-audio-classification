@@ -1,0 +1,52 @@
+Models and training/configuration notes
+
+1) lite_cnn_v1.pt
+   - Model: LiteAudioCNN
+   - width_mult: 1.0
+   - dropout: 0.2
+   - lr: 5e-4
+   - batch_size: 4
+   - epochs: 50
+
+2) lite_cnn_v2.pt
+   - Model: LiteAudioCNN
+   - width_mult: 1.2
+   - dropout: 0.5
+   - lr: 1e-4
+   - batch_size: 4
+   - epochs: 50
+
+3) lite_cnn_v3.pt
+   - Model: LiteAudioCNN
+   - width_mult: 0.8
+   - dropout: 0.3
+   - lr: 5e-5
+   - batch_size: 4
+   - epochs: 50
+
+4) lite_cnn_v4.pt
+   - Model: LiteAudioCNN
+   - width_mult: 1.5
+   - dropout: 0.4
+   - lr: 1e-3
+   - batch_size: 4
+   - epochs: 50
+
+5) wav2vec2_v1.pt
+   - Model: Wav2Vec2Classifier
+   - lr: 3e-4
+   - epochs: 30
+   - batch_size: 2
+   - num_unfrozen_layers: 0 (default, freeze all)
+
+6) wav2vec2_v2.pt
+   - Model: Wav2Vec2Classifier
+   - lr: 5e-4
+   - epochs: 20
+   - batch_size: 2
+   - num_unfrozen_layers: 2
+
+Notes:
+- All models use class weights, WeightedRandomSampler, and other defaults from config.py unless overridden.
+- Dataset: Stratified split 80/20 train/val.
+- Audio: 16kHz, mono, 8s target, mel-spec for CNN, raw audio for Wav2Vec2.

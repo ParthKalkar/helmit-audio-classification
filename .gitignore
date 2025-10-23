@@ -1,0 +1,29 @@
+# Virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Data (large files, sensitive)
+data/
+*.zip
+*.wav
+*.mp3
+
+# Model files (large, can be regenerated)
+*.pt
+*_fixed.onnx
+*_int8.onnx
+*_cleaned.onnx
+*.onnx.data
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+model_metrics.txt  # Can be regenerated
+
+# Temporary files
+*.tmp
+*.bak
