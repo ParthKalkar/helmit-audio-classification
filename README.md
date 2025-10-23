@@ -261,6 +261,8 @@ Detailed breakdown of all files:
 - **`*_fixed.onnx`**: FP32 ONNX models (dynamic batch/time).
 - **`*_int8.onnx`**: Quantized INT8 ONNX (CNN only).
 
+**Note**: Model files are too large to be shared via GitHub due to platform size limits (100MB per file). Trained models are available locally in the `models/` folder for development and testing.
+
 ## Results
 ### Performance Summary
 | Model          | Accuracy | Precision | Recall | F1 Score | Notes |
